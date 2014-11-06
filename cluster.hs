@@ -94,7 +94,9 @@ getCol board y
 	| otherwise = getCol (tail board) (y - 1)
 
 
---MOVEMENT STUFF
+	
+	
+--MOVEMENT STUFF TO MAKE NEW BOARD (states)
 --Make move, loc1 and loc2 are (x,y) coords
 
 --makeMove board loc1 loc2 player
@@ -105,11 +107,12 @@ getCol board y
 --	| (((fst loc1) < (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownRight board loc1 loc2 player
 
 --move to the left, only returns the row, need to put it back to the board	
-moveLeft board loc1 loc2 player = 	(replace board --replaces old board with changes
+
+moveLeft board loc1 loc2 player = 	replace board --replaces old board with changes
 										(clearSpace  --clear the old location
 											(replaceListElem (getRow board (snd loc1)) ((fst loc1) - 2) player) --changes validspot into new player spot
 										(fst loc1)) 
-									(snd loc1) 0)
+									(snd loc1) 0
 				
 moveRight board loc1 loc2 player = 	replace board 
 										(clearSpace 
@@ -121,7 +124,7 @@ moveDownLeft board loc1 loc2 player = 	replace board --replaces old board with c
 											(clearSpace --clear old position
 												(getRow
 													(replace board --replace old board with changes from moving to new location
-														(replaceListElem (getRow board ((snd loc1) + 1) ((fst loc1) - 1) player)) --changes validspot into new player spot 
+														(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) - 1) player) --changes validspot into new player spot 
 													((snd loc1) + 1) 0)
 												(snd loc1))	
 											(fst loc1)) 
@@ -131,7 +134,7 @@ moveDownRight board loc1 loc2 player = 	replace board
 											(clearSpace 
 												(getRow
 													(replace board 
-														(replaceListElem (getRow board ((snd loc1) + 1) ((fst loc1) + 1) player)) 
+														(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) + 1) player) 
 													((snd loc1) + 1) 0)
 												(snd loc1))	
 											(fst loc1)) 
@@ -141,7 +144,7 @@ moveUpLeft board loc1 loc2 player = 	replace board
 											(clearSpace 
 												(getRow
 													(replace board 
-														(replaceListElem (getRow board ((snd loc1) - 1) ((fst loc1) - 1) player)) 
+														(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) - 1) player) 
 													((snd loc1) - 1) 0)
 												(snd loc1))	
 											(fst loc1)) 
@@ -151,7 +154,7 @@ moveUpRight board loc1 loc2 player = 	replace board
 											(clearSpace 
 												(getRow
 													(replace board 
-														(replaceListElem (getRow board ((snd loc1) - 1) ((fst loc1) + 1) player)) 
+														(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) + 1) player)
 													((snd loc1) - 1) 0)
 												(snd loc1))	
 											(fst loc1)) 
@@ -217,7 +220,7 @@ capture_i5a8 loc1 loc2
 replace board line row start
 	| null board = []
 	| start == row = line:(tail board)
-	| otherwise = (head board) : replace (tail board) row (start + 1)
+	| otherwise = (head board) : replace (tail board) line row (start + 1)
 
 -- -----------------------------------------ONLINE STUFF-------------------------------------------	
 -- -- moves a given pawn left and forward relative to direction of travel

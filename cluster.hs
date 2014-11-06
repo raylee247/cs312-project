@@ -102,19 +102,25 @@ getCol board y
 
 	
 	
---MOVEMENT STUFF TO MAKE NEW BOARD (states)
+-------------------------MOVEMENT STUFF TO MAKE NEW BOARD (states)------------------------------------------
 --Make move, loc1 and loc2 are (x,y) coords
+--UNCOMMMENT WHEN GENERATE STATES && MINIMAX IS DONE, THIS WILL DETERMINE IF MOVES ARE POSSIBLE
 
---makeMove board loc1 loc2 player
+--Make a move, check if the spot is valid, and also if the generated board has not already been generated
+--when calling makeMove, history initially needs to be an empty list (it keeps track of all used boards, we cannot have the same board twice
+
+--makeMove board loc1 loc2 player history
 --	| null board = []
---	| (((fst loc1) > (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveLeft board loc1 player
---	| (((fst loc1) < (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveRight board loc1 player
---	| (((fst loc1) > (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownLeft board loc1 player
---	| (((fst loc1) < (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownRight board loc1 player
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = if (elem (moveLeft board loc1 player) history) then history else (moveLeft board loc1 player) : history
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = if (elem (moveRightt board loc1 player) history) then history else (moveRight board loc1 player) : history
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) < (snd loc2))) && (validSpot_i5a8 loc1 loc2) = if (elem (moveDownLeft board loc1 player) history) then history else (moveDownLeft board loc1 player) : history
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) < (snd loc2))) && (validSpot_i5a8 loc1 loc2) = if (elem (moveDownRight board loc1 player) history) then history else (moveDownRight board loc1 player) : history
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = if (elem (moveUpLeft board loc1 player) history) then history else (moveUpLeft board loc1 player) : history
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = if (elem (moveUpRight board loc1 player) history) then history else (moveUpRight board loc1 player) : history
+--	| otherwise = history
 
---move to the left, only returns the row, need to put it back to the board	
-
-moveLeft board loc1 loc2 player = 	replace board --replaces old board with changes
+--Makes a left slide
+moveLeft board loc1 player = 	replace board --replaces old board with changes
 										(clearSpace  --clear the old location
 											(replaceListElem (getRow board (snd loc1)) ((fst loc1) - 2) player) --changes validspot into new player spot
 										(fst loc1)) 
@@ -126,7 +132,8 @@ moveLeft board loc1 loc2 player = 	replace board --replaces old board with chang
 --[-*-*-*-*-]
 --[*-*B*B*-*]
 --[**B*B*B**]
-				
+
+--Makes a right slide				
 moveRight board loc1 player = 	replace board 
 										(clearSpace 
 											(replaceListElem (getRow board (snd loc1)) ((fst loc1) + 2) player) 
@@ -140,7 +147,8 @@ moveRight board loc1 player = 	replace board
 --[-*-*-*-*-]
 --[*-*B*B*-*]
 --[**B*B*B**]									
-									
+
+--Makes a down and left slide				
 moveDownLeft board loc1  player = 	replace newboard --replaces old board with changes
 											(clearSpace --clear old position
 												(getRow newboard (snd loc1))	
@@ -157,7 +165,8 @@ moveDownLeft board loc1  player = 	replace newboard --replaces old board with ch
 --[-*-*W*-*-]
 --[*-*B*B*-*]
 --[**B*B*B**]													
-													
+					
+--Makes a down and right slide					
 moveDownRight board loc1  player = 	replace newboard 
 											(clearSpace 
 												(getRow newboard (snd loc1))	
@@ -175,6 +184,7 @@ moveDownRight board loc1  player = 	replace newboard
 --[*-*B*B*-*]
 --[**B*B*B**]	
 
+--Makes a up and left slide
 moveUpLeft board loc1  player = 	replace newboard
 											(clearSpace 
 												(getRow
@@ -194,6 +204,8 @@ moveUpLeft board loc1  player = 	replace newboard
 --[*-*B*-*-*]
 --[**B*B*B**]	
 
+
+--Makes a up and right slide
 moveUpRight board loc1  player = 	replace newboard 
 											(clearSpace 
 												(getRow newboard (snd loc1))	
@@ -275,55 +287,6 @@ replace board line row start
 	| start == row = line:(tail board)
 	| otherwise = (head board) : replace (tail board) line row (start + 1)
 
--- -----------------------------------------ONLINE STUFF-------------------------------------------	
--- -- moves a given pawn left and forward relative to direction of travel
--- -- this is the only pawn moving function that contains real implementaiton, other pawn moving functions makes use of this default function with representation adjusted appropriately
--- generateNewStatePawnMvLeftDefault :: [String] -> Char -> (Int, Int) -> Bool -> [String]
--- generateNewStatePawnMvLeftDefault currBoard player pawnloc isJump
-	-- | ((fst pawnloc) >= (length currBoard) - 1) || null (fst newStr2) = []
-	-- | not isJump = replaceListElem (replaceListElem currBoard (fst pawnloc) (generateStr1 (currBoard !! (fst pawnloc)) (snd pawnloc))) (fst pawnloc + 1) (fst newStr2)
-	-- | otherwise = generateNewStatePawnMvLeftDefault (replaceListElem (replaceListElem currBoard (fst pawnloc) (generateStr1 (currBoard !! (fst pawnloc)) (snd pawnloc))) (fst pawnloc + 1) (fst newStr2))
-				-- player ((fst pawnloc + 1), snd newStr2) False
-	-- where 
-		-- newStr2 = generateStr2MvLeft (currBoard !! (fst pawnloc)) (currBoard !! (fst pawnloc + 1)) (snd pawnloc) isJump
-
--- -- moves given pawn left and forward simply by passing params into generateNewStatePawnMvLeftDefault
--- -- this funciton exists for consistency in funciton naming and organization
--- generateNewStatePawnMvLeft :: [String] -> Char -> (Int, Int) -> [String]
--- generateNewStatePawnMvLeft currBoard player pawnloc = generateNewStatePawnMvLeftDefault currBoard player pawnloc False
-
--- -- moves given pawn right and forward
--- generateNewStatePawnMvRight :: [String] -> Char -> (Int, Int) -> [String]
--- generateNewStatePawnMvRight currBoard player pawnloc = reverseBoard (generateNewStatePawnMvLeftDefault (reverseBoard currBoard) player (fst pawnloc, (length (currBoard !! (fst pawnloc)) - (snd pawnloc + 1))) False)
-
--- -- jumps given pawn left and forward where appropriate (removing an opponene pawn)
--- generateNewStatePawnJumpLeft :: [String] -> Char -> (Int, Int) -> [String]
--- generateNewStatePawnJumpLeft currBoard player pawnloc
--- = generateNewStatePawnMvLeftDefault currBoard player pawnloc True
-
--- -- jumps given pawn right and forward where appropriate (removing an opponene pawn)
--- generateNewStatePawnJumpRight :: [String] -> Char -> (Int, Int) -> [String]
--- generateNewStatePawnJumpRight currBoard player pawnloc
--- = reverseBoard (generateNewStatePawnMvLeftDefault (reverseBoard currBoard) player (fst pawnloc, (length (currBoard !! (fst pawnloc)) - (snd pawnloc + 1))) True)
-
--- -- generates resulting str1 from generating new state
--- -- used to replace str1 in current state
--- generateStr1 :: String -> Int -> String
--- generateStr1 str1 index = replaceListElem str1 index '-'
-
--- -- generates resulting str2 from generating new state when moving pawn left and forward
--- -- used to replace str2 in current state
--- generateStr2MvLeft :: String -> String -> Int -> Bool -> (String, Int)
--- generateStr2MvLeft str1 str2 index isJump
-	-- | ((length str1 - length str2) == 1) && (index > 0) = makeMove str2 (index - 1) (str1 !! index) isJump
-	-- | ((length str1 - length str2) == -1) && (index < length str1) = makeMove str2 index (str1 !! index) isJump
-	-- | otherwise	= ([], 0)
-
--- -- called by generateStr1MvLeft to actually move pawns
--- makeMove :: String -> Int -> Char -> Bool -> (String, Int)
--- makeMove str2 index pawn isJump
-	-- | (isJump && canJump pawn (str2 !! index)) || (not isJump && canMove pawn (str2 !! index)) = ((replaceListElem str2 index pawn), index)
-	-- | otherwise	= ([], 0)
 
 
 

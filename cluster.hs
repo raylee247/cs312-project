@@ -1,6 +1,8 @@
 -- CPSC 312 Project 1
 -- Raymond Lee 35832112
 
+board3 = "WWW-WW-------BB-BBB"
+
 --Starting the game
 cluster_i5a8 board player minimax dimension = generateBoard_i5a8 board player minimax dimension
 
@@ -58,25 +60,145 @@ addPadding_helper count
 	| count == 0		= []
 	| otherwise		= '*':(addPadding_helper (count-1))
 
-
-
 ------------------------------------------------------------------------------	
-	
 
-
+--NOTE: Using board as a replacement so that I can test other components
 --Initiating the game
 generateNewBoard_i5a8 board player minimax dimension
-	| (board == []) || (dimension == 0) = board
+	| null newboard = board
 	| minimax == 1 = board--need to make minimax
 	| otherwise = board --generateNewBoard board player (minimax - 1) dimension --reduction step here?
 	where 
-		player = 	if (player == 'w') then 'b' --changing turns
-					else 'w' 
-	
+		player = 	if (player == 'w') then 'b' else 'w' --changing turns 
+		newboard = board -- generateNewState board player [] --should be this
+		
+		
+--------------------------------------------------------------------------------
 
+--get character at x,y *******SOLELY USED FOR TESTING PURPOSES**********
+getCoord :: [String] -> Int -> Int -> Char
+getCoord board x y = getCol (getRow board y) x 
+
+getRow :: [String] -> Int -> String
+getRow board x
+	| null board = []
+	| x == 0 = (head board)
+	| otherwise = getRow (tail board) (x - 1)
+	
+--	[**W*W*W**]
+--	[*-*W*W*-*]
+getCol :: String -> Int -> Char
+getCol board y
+	| null board = 'n'
+	| y == 0 = head board
+	| otherwise = getCol (tail board) (y - 1)
 
 
 --MOVEMENT STUFF
+--Make move, loc1 and loc2 are (x,y) coords
+
+--makeMove board loc1 loc2 player
+--	| null board = []
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveLeft board loc1 loc2 player
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveRight board loc1 loc2 player
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownLeft board loc1 loc2 player
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownRight board loc1 loc2 player
+
+--move to the left, only returns the row, need to put it back to the board	
+moveLeft board loc1 loc2 player = 	(replace board --replaces old board with changes
+										(clearSpace  --clear the old location
+											(replaceListElem (getRow board (snd loc1)) ((fst loc1) - 2) player) --changes validspot into new player spot
+										(fst loc1)) 
+									(snd loc1) 0)
+				
+moveRight board loc1 loc2 player = 	replace board 
+										(clearSpace 
+											(replaceListElem (getRow board (snd loc1)) ((fst loc1) + 2) player) 
+										(fst loc1)) 
+									(snd loc1) 0
+
+moveDownLeft board loc1 loc2 player = 	replace board --replaces old board with changes
+											(clearSpace --clear old position
+												(getRow
+													(replace board --replace old board with changes from moving to new location
+														(replaceListElem (getRow board ((snd loc1) + 1) ((fst loc1) - 1) player)) --changes validspot into new player spot 
+													((snd loc1) + 1) 0)
+												(snd loc1))	
+											(fst loc1)) 
+										(snd loc1) 0
+
+moveDownRight board loc1 loc2 player = 	replace board 
+											(clearSpace 
+												(getRow
+													(replace board 
+														(replaceListElem (getRow board ((snd loc1) + 1) ((fst loc1) + 1) player)) 
+													((snd loc1) + 1) 0)
+												(snd loc1))	
+											(fst loc1)) 
+										(snd loc1) 0
+
+moveUpLeft board loc1 loc2 player = 	replace board 
+											(clearSpace 
+												(getRow
+													(replace board 
+														(replaceListElem (getRow board ((snd loc1) - 1) ((fst loc1) - 1) player)) 
+													((snd loc1) - 1) 0)
+												(snd loc1))	
+											(fst loc1)) 
+										(snd loc1) 0
+
+moveUpRight board loc1 loc2 player = 	replace board 
+											(clearSpace 
+												(getRow
+													(replace board 
+														(replaceListElem (getRow board ((snd loc1) - 1) ((fst loc1) + 1) player)) 
+													((snd loc1) - 1) 0)
+												(snd loc1))	
+											(fst loc1)) 
+										(snd loc1) 0
+
+--FLIP IS NOT IN USE, CHANGED IDEA FOR NOW
+--reverse the board, and change loc1 and loc2's Y values, change player or move "up"
+--then flips the board so that we know we're on the other players turn
+--play who is playing will be on top when visualizing, but will flip back over once done, so when added to state it
+--should be all the same
+
+--ex. W's turn, moves to the left
+--[**W*W*W**]
+--[*-*W*W*-*]
+--[-*-*-*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]
+
+--[**W*W*W**]
+--[*W*-*W*-*]
+--[-*-*-*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]
+--End turn
+
+--Flip, B's turn, moves right
+--[**B*B*B**]
+--[*-*B*B*-*]
+--[-*-*-*-*-]
+--[*W*-*W*-*]
+--[**W*W*W**]
+--flipBoard board loc1 loc2 player = flipBoard_helper board loc1 loc2 player []
+
+--flipBoard_helper board loc1 loc2 player acc
+--	| null board = makeMove acc (fst loc1):((length board) - (snd loc1)) (fst loc2):((length board) - (snd loc2)) player
+--	| otherwise = flipBoard_helper (tail board) loc1 loc2 player((head board):acc)
+
+--replace piece that moved with a -
+clearSpace str1 index = replaceListElem str1 index '-'
+	
+--replaces index with that element	
+replaceListElem list index elem
+	| null list = []
+	| index == 0	= elem : (tail list)
+	| otherwise	= (head list) : replaceListElem (tail list) (index - 1) elem
+
+	
 --check if space is empty
 isEmpty_i5a8 space
 	| space == '-' = True
@@ -91,4 +213,61 @@ capture_i5a8 loc1 loc2
 	| ((loc1 == 'w') && (loc2 == 'b')) || ((loc1 == 'b') && (loc2 == 'w')) = True
 	| otherwise = False
 	
-	
+--change board with new row, start = 0
+replace board line row start
+	| null board = []
+	| start == row = line:(tail board)
+	| otherwise = (head board) : replace (tail board) row (start + 1)
+
+-- -----------------------------------------ONLINE STUFF-------------------------------------------	
+-- -- moves a given pawn left and forward relative to direction of travel
+-- -- this is the only pawn moving function that contains real implementaiton, other pawn moving functions makes use of this default function with representation adjusted appropriately
+-- generateNewStatePawnMvLeftDefault :: [String] -> Char -> (Int, Int) -> Bool -> [String]
+-- generateNewStatePawnMvLeftDefault currBoard player pawnloc isJump
+	-- | ((fst pawnloc) >= (length currBoard) - 1) || null (fst newStr2) = []
+	-- | not isJump = replaceListElem (replaceListElem currBoard (fst pawnloc) (generateStr1 (currBoard !! (fst pawnloc)) (snd pawnloc))) (fst pawnloc + 1) (fst newStr2)
+	-- | otherwise = generateNewStatePawnMvLeftDefault (replaceListElem (replaceListElem currBoard (fst pawnloc) (generateStr1 (currBoard !! (fst pawnloc)) (snd pawnloc))) (fst pawnloc + 1) (fst newStr2))
+				-- player ((fst pawnloc + 1), snd newStr2) False
+	-- where 
+		-- newStr2 = generateStr2MvLeft (currBoard !! (fst pawnloc)) (currBoard !! (fst pawnloc + 1)) (snd pawnloc) isJump
+
+-- -- moves given pawn left and forward simply by passing params into generateNewStatePawnMvLeftDefault
+-- -- this funciton exists for consistency in funciton naming and organization
+-- generateNewStatePawnMvLeft :: [String] -> Char -> (Int, Int) -> [String]
+-- generateNewStatePawnMvLeft currBoard player pawnloc = generateNewStatePawnMvLeftDefault currBoard player pawnloc False
+
+-- -- moves given pawn right and forward
+-- generateNewStatePawnMvRight :: [String] -> Char -> (Int, Int) -> [String]
+-- generateNewStatePawnMvRight currBoard player pawnloc = reverseBoard (generateNewStatePawnMvLeftDefault (reverseBoard currBoard) player (fst pawnloc, (length (currBoard !! (fst pawnloc)) - (snd pawnloc + 1))) False)
+
+-- -- jumps given pawn left and forward where appropriate (removing an opponene pawn)
+-- generateNewStatePawnJumpLeft :: [String] -> Char -> (Int, Int) -> [String]
+-- generateNewStatePawnJumpLeft currBoard player pawnloc
+-- = generateNewStatePawnMvLeftDefault currBoard player pawnloc True
+
+-- -- jumps given pawn right and forward where appropriate (removing an opponene pawn)
+-- generateNewStatePawnJumpRight :: [String] -> Char -> (Int, Int) -> [String]
+-- generateNewStatePawnJumpRight currBoard player pawnloc
+-- = reverseBoard (generateNewStatePawnMvLeftDefault (reverseBoard currBoard) player (fst pawnloc, (length (currBoard !! (fst pawnloc)) - (snd pawnloc + 1))) True)
+
+-- -- generates resulting str1 from generating new state
+-- -- used to replace str1 in current state
+-- generateStr1 :: String -> Int -> String
+-- generateStr1 str1 index = replaceListElem str1 index '-'
+
+-- -- generates resulting str2 from generating new state when moving pawn left and forward
+-- -- used to replace str2 in current state
+-- generateStr2MvLeft :: String -> String -> Int -> Bool -> (String, Int)
+-- generateStr2MvLeft str1 str2 index isJump
+	-- | ((length str1 - length str2) == 1) && (index > 0) = makeMove str2 (index - 1) (str1 !! index) isJump
+	-- | ((length str1 - length str2) == -1) && (index < length str1) = makeMove str2 index (str1 !! index) isJump
+	-- | otherwise	= ([], 0)
+
+-- -- called by generateStr1MvLeft to actually move pawns
+-- makeMove :: String -> Int -> Char -> Bool -> (String, Int)
+-- makeMove str2 index pawn isJump
+	-- | (isJump && canJump pawn (str2 !! index)) || (not isJump && canMove pawn (str2 !! index)) = ((replaceListElem str2 index pawn), index)
+	-- | otherwise	= ([], 0)
+
+
+

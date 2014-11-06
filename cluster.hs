@@ -1,8 +1,10 @@
 -- CPSC 312 Project 1
 -- Raymond Lee 35832112
 
-board3 = "WWW-WW-------BB-BBB"
-testboard = convertBoard_i5a8 board3 3 --[**W*W*W**,*-*W*W*-*,-*-*-*-*-,*-*B*B*-*,**B*B*B**]
+board1 = "WWW-WW-------BB-BBB"
+board2 = "WWW-----WW---BB-BBB"
+testboard = convertBoard_i5a8 board1 3 --[**W*W*W**,*-*W*W*-*,-*-*-*-*-,*-*B*B*-*,**B*B*B**]
+testboard2 = convertBoard_i5a8 board2 3 --[**W*W*W**,*-*-*-*-*,-*W*W*-*-,*-*B*B*-*,**B*B*B**]
 --[**W*W*W**]
 --[*-*W*W*-*]
 --[-*-*-*-*-]
@@ -121,10 +123,10 @@ getCol board y
 
 --Makes a left slide
 moveLeft board loc1 player = 	replace board --replaces old board with changes
-										(clearSpace  --clear the old location
-											(replaceListElem (getRow board (snd loc1)) ((fst loc1) - 2) player) --changes validspot into new player spot
-										(fst loc1)) 
-									(snd loc1) 0
+									(clearSpace  --clear the old location
+										(replaceListElem (getRow board (snd loc1)) ((fst loc1) - 2) player) --changes validspot into new player spot
+									(fst loc1)) 
+								(snd loc1) 0
 --TEST CASE 
 --moveLeft testboard (3,1) (2,1) "W"
 --[**W*W*W**]
@@ -135,10 +137,10 @@ moveLeft board loc1 player = 	replace board --replaces old board with changes
 
 --Makes a right slide				
 moveRight board loc1 player = 	replace board 
-										(clearSpace 
-											(replaceListElem (getRow board (snd loc1)) ((fst loc1) + 2) player) 
-										(fst loc1)) 
-									(snd loc1) 0
+									(clearSpace 
+										(replaceListElem (getRow board (snd loc1)) ((fst loc1) + 2) player) 
+									(fst loc1)) 
+								(snd loc1) 0
 
 --TEST CASE 
 --moveLeft testboard (5,1) (7,1) "W"
@@ -150,14 +152,14 @@ moveRight board loc1 player = 	replace board
 
 --Makes a down and left slide				
 moveDownLeft board loc1  player = 	replace newboard --replaces old board with changes
-											(clearSpace --clear old position
-												(getRow newboard (snd loc1))	
-											(fst loc1)) 
-										(snd loc1) 0
-										where
-											newboard = 	(replace board --replace old board with changes from moving to new location
-															(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) - 1) player) --changes validspot into new player spot 
-														((snd loc1) + 1) 0)
+										(clearSpace --clear old position
+											(getRow newboard (snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board --replace old board with changes from moving to new location
+														(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) - 1) player) --changes validspot into new player spot 
+													((snd loc1) + 1) 0)
 --TEST CASE 
 --moveDownLeft testboard (5,1) "W"
 --[**W*W*W**]
@@ -168,14 +170,14 @@ moveDownLeft board loc1  player = 	replace newboard --replaces old board with ch
 					
 --Makes a down and right slide					
 moveDownRight board loc1  player = 	replace newboard 
-											(clearSpace 
-												(getRow newboard (snd loc1))	
-											(fst loc1)) 
-										(snd loc1) 0
-										where
-											newboard = 	(replace board 
-															(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) + 1) player) 
-														((snd loc1) + 1) 0)
+										(clearSpace 
+											(getRow newboard (snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board 
+														(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) + 1) player) 
+													((snd loc1) + 1) 0)
 --TEST CASE 
 --moveDownRight testboard (5,1) "W"
 --[**W*W*W**]
@@ -186,16 +188,16 @@ moveDownRight board loc1  player = 	replace newboard
 
 --Makes a up and left slide
 moveUpLeft board loc1  player = 	replace newboard
-											(clearSpace 
-												(getRow
-													newboard
-												(snd loc1))	
-											(fst loc1)) 
-										(snd loc1) 0
-										where
-											newboard = 	(replace board 
-															(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) - 1) player) 
-														((snd loc1) - 1) 0)
+										(clearSpace 
+											(getRow
+												newboard
+											(snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board 
+														(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) - 1) player) 
+													((snd loc1) - 1) 0)
 --TEST CASE 
 --moveUpLeft testboard (5,3) "B"
 --[**W*W*W**]
@@ -207,14 +209,14 @@ moveUpLeft board loc1  player = 	replace newboard
 
 --Makes a up and right slide
 moveUpRight board loc1  player = 	replace newboard 
-											(clearSpace 
-												(getRow newboard (snd loc1))	
-											(fst loc1)) 
-										(snd loc1) 0
-										where
-											newboard = 	(replace board 
-															(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) + 1) player)
-														((snd loc1) - 1) 0)
+										(clearSpace 
+											(getRow newboard (snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board 
+														(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) + 1) player)
+													((snd loc1) - 1) 0)
 --TEST CASE 
 --moveUpRight testboard (5,1) "B"
 --[**W*W*W**]
@@ -222,6 +224,114 @@ moveUpRight board loc1  player = 	replace newboard
 --[-*-*-*B*-]
 --[*-*B*-*-*]
 --[**B*B*B**]	
+
+----------------------------JUMPING--------------------------------------------
+
+--SAME COMMENTS AS THE makeMove
+
+--makeJump board loc1 loc2 player history
+--	| null board = []
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) && (capture_i5a8 loc1 loc2)= if (elem (jumpLeft board loc1 player) history) then history else (jumpLeft board loc1 player) : history
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) && (capture_i5a8 loc1 loc2)= if (elem (jumpRight board loc1 player) history) then history else (jumpRight board loc1 player) : history
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) < (snd loc2))) && (validSpot_i5a8 loc1 loc2) && (capture_i5a8 loc1 loc2)= if (elem (jumpDownLeft board loc1 player) history) then history else (jumpDownLeft board loc1 player) : history
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) < (snd loc2))) && (validSpot_i5a8 loc1 loc2) && (capture_i5a8 loc1 loc2)= if (elem (jumpDownRight board loc1 player) history) then history else (jumpDownRight board loc1 player) : history
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) && (capture_i5a8 loc1 loc2)= if (elem (jumpUpLeft board loc1 player) history) then history else (jumpUpLeft board loc1 player) : history
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) && (capture_i5a8 loc1 loc2)= if (elem (jumpUpRight board loc1 player) history) then history else (jumpUpRight board loc1 player) : history
+--	| otherwise = history
+
+jumpLeft board loc1 player = replace board --replaces old board with changes
+								(clearSpace  --clear the old location
+									(replaceListElem (getRow board (snd loc1)) ((fst loc1) - 4) player) --changes validspot into new player spot
+								(fst loc1)) 
+							(snd loc1) 0
+--TEST CASE
+--jumpLeft testboard2 (4,2) 'W'
+--[**W*W*W**]
+--[*-*-*-*-*]
+--[W*W*-*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]	
+							
+jumpRight board loc1 player = replace board --replaces old board with changes
+								(clearSpace  --clear the old location
+									(replaceListElem (getRow board (snd loc1)) ((fst loc1) + 4) player) --changes validspot into new player spot
+								(fst loc1)) 
+							(snd loc1) 0
+--TEST CASE
+--jumpLeft testboard2 (2,2) 'W'
+--[**W*W*W**]
+--[*-*-*-*-*]
+--[-*-*W*W*-]
+--[*-*B*B*-*]
+--[**B*B*B**]
+
+jumpDownLeft board loc1  player = 	replace newboard --replaces old board with changes
+										(clearSpace --clear old position
+											(getRow newboard (snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board --replace old board with changes from moving to new location
+														(replaceListElem (getRow board ((snd loc1) + 2)) ((fst loc1) - 2) player) --changes validspot into new player spot 
+													((snd loc1) + 2) 0)
+--TEST CASE
+--jumpDownLeft testboard (4,0) 'W'
+--[**W*-*W**]
+--[*-*W*W*-*]
+--[-*W*-*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]
+
+jumpDownRight board loc1  player = 	replace newboard --replaces old board with changes
+										(clearSpace --clear old position
+											(getRow newboard (snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board --replace old board with changes from moving to new location
+														(replaceListElem (getRow board ((snd loc1) + 2)) ((fst loc1) + 2) player) --changes validspot into new player spot 
+													((snd loc1) + 2) 0)
+--TEST CASE
+--jumpDownRight testboard (4,0) 'W'
+--[**W*-*W**]
+--[*-*W*W*-*]
+--[-*-*-*W*-]
+--[*-*B*B*-*]
+--[**B*B*B**]
+
+jumpUpLeft board loc1  player = 	replace newboard --replaces old board with changes
+										(clearSpace --clear old position
+											(getRow newboard (snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board --replace old board with changes from moving to new location
+														(replaceListElem (getRow board ((snd loc1) - 2)) ((fst loc1) - 2) player) --changes validspot into new player spot 
+													((snd loc1) - 2) 0)
+--TEST CASE
+--jumpUpLeft testboard2 (4,4) 'B'
+--[**W*W*W**]
+--[*-*W*W*-*]
+--[-*B*-*-*-]
+--[*-*B*B*-*]
+--[**B*-*B**]
+
+jumpUpRight board loc1  player = 	replace newboard --replaces old board with changes
+										(clearSpace --clear old position
+											(getRow newboard (snd loc1))	
+										(fst loc1)) 
+									(snd loc1) 0
+									where
+										newboard = 	(replace board --replace old board with changes from moving to new location
+														(replaceListElem (getRow board ((snd loc1) - 2)) ((fst loc1) + 2) player) --changes validspot into new player spot 
+													((snd loc1) - 2) 0)
+--TEST CASE
+--jumpUpLeft testboard2 (4,4) 'B'
+--[**W*W*W**]
+--[*-*W*W*-*]
+--[-*-*-*B*-]
+--[*-*B*B*-*]
+--[**B*-*B**]
 
 
 --------------------------FLIP IS NOT IN USE, CHANGED IDEA FOR NOW--------------------------------------------

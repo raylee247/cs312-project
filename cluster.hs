@@ -2,7 +2,13 @@
 -- Raymond Lee 35832112
 
 board3 = "WWW-WW-------BB-BBB"
-
+testboard = convertBoard_i5a8 board3 3 --[**W*W*W**,*-*W*W*-*,-*-*-*-*-,*-*B*B*-*,**B*B*B**]
+--[**W*W*W**]
+--[*-*W*W*-*]
+--[-*-*-*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]
+testrow = getRow testboard 2
 --Starting the game
 cluster_i5a8 board player minimax dimension = generateBoard_i5a8 board player minimax dimension
 
@@ -77,7 +83,7 @@ generateNewBoard_i5a8 board player minimax dimension
 
 --get character at x,y *******SOLELY USED FOR TESTING PURPOSES**********
 getCoord :: [String] -> Int -> Int -> Char
-getCoord board x y = getCol (getRow board y) x 
+getCoord board x y = getCol (getRow board x) y 
 
 getRow :: [String] -> Int -> String
 getRow board x
@@ -101,10 +107,10 @@ getCol board y
 
 --makeMove board loc1 loc2 player
 --	| null board = []
---	| (((fst loc1) > (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveLeft board loc1 loc2 player
---	| (((fst loc1) < (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveRight board loc1 loc2 player
---	| (((fst loc1) > (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownLeft board loc1 loc2 player
---	| (((fst loc1) < (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownRight board loc1 loc2 player
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveLeft board loc1 player
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) == (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveRight board loc1 player
+--	| (((fst loc1) > (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownLeft board loc1 player
+--	| (((fst loc1) < (fst loc2)) && ((snd loc1) > (snd loc2))) && (validSpot_i5a8 loc1 loc2) = moveDownRight board loc1 player
 
 --move to the left, only returns the row, need to put it back to the board	
 
@@ -113,54 +119,100 @@ moveLeft board loc1 loc2 player = 	replace board --replaces old board with chang
 											(replaceListElem (getRow board (snd loc1)) ((fst loc1) - 2) player) --changes validspot into new player spot
 										(fst loc1)) 
 									(snd loc1) 0
+--TEST CASE 
+--moveLeft testboard (3,1) (2,1) "W"
+--[**W*W*W**]
+--[*W*-*W*-*]
+--[-*-*-*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]
 				
-moveRight board loc1 loc2 player = 	replace board 
+moveRight board loc1 player = 	replace board 
 										(clearSpace 
 											(replaceListElem (getRow board (snd loc1)) ((fst loc1) + 2) player) 
 										(fst loc1)) 
 									(snd loc1) 0
 
-moveDownLeft board loc1 loc2 player = 	replace board --replaces old board with changes
+--TEST CASE 
+--moveLeft testboard (5,1) (7,1) "W"
+--[**W*W*W**]
+--[*-*W*-*W*]
+--[-*-*-*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]									
+									
+moveDownLeft board loc1  player = 	replace newboard --replaces old board with changes
 											(clearSpace --clear old position
-												(getRow
-													(replace board --replace old board with changes from moving to new location
-														(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) - 1) player) --changes validspot into new player spot 
-													((snd loc1) + 1) 0)
-												(snd loc1))	
+												(getRow newboard (snd loc1))	
 											(fst loc1)) 
 										(snd loc1) 0
+										where
+											newboard = 	(replace board --replace old board with changes from moving to new location
+															(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) - 1) player) --changes validspot into new player spot 
+														((snd loc1) + 1) 0)
+--TEST CASE 
+--moveDownLeft testboard (5,1) "W"
+--[**W*W*W**]
+--[*-*W*-*-*]
+--[-*-*W*-*-]
+--[*-*B*B*-*]
+--[**B*B*B**]													
+													
+moveDownRight board loc1  player = 	replace newboard 
+											(clearSpace 
+												(getRow newboard (snd loc1))	
+											(fst loc1)) 
+										(snd loc1) 0
+										where
+											newboard = 	(replace board 
+															(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) + 1) player) 
+														((snd loc1) + 1) 0)
+--TEST CASE 
+--moveDownRight testboard (5,1) "W"
+--[**W*W*W**]
+--[*-*W*-*-*]
+--[-*-*-*W*-]
+--[*-*B*B*-*]
+--[**B*B*B**]	
 
-moveDownRight board loc1 loc2 player = 	replace board 
+moveUpLeft board loc1  player = 	replace newboard
 											(clearSpace 
 												(getRow
-													(replace board 
-														(replaceListElem (getRow board ((snd loc1) + 1)) ((fst loc1) + 1) player) 
-													((snd loc1) + 1) 0)
+													newboard
 												(snd loc1))	
 											(fst loc1)) 
 										(snd loc1) 0
+										where
+											newboard = 	(replace board 
+															(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) - 1) player) 
+														((snd loc1) - 1) 0)
+--TEST CASE 
+--moveUpLeft testboard (5,3) "B"
+--[**W*W*W**]
+--[*-*W*Q*-*]
+--[-*-*B*-*-]
+--[*-*B*-*-*]
+--[**B*B*B**]	
 
-moveUpLeft board loc1 loc2 player = 	replace board 
+moveUpRight board loc1  player = 	replace newboard 
 											(clearSpace 
-												(getRow
-													(replace board 
-														(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) - 1) player) 
-													((snd loc1) - 1) 0)
-												(snd loc1))	
+												(getRow newboard (snd loc1))	
 											(fst loc1)) 
 										(snd loc1) 0
+										where
+											newboard = 	(replace board 
+															(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) + 1) player)
+														((snd loc1) - 1) 0)
+--TEST CASE 
+--moveUpRight testboard (5,1) "B"
+--[**W*W*W**]
+--[*-*W*W*-*]
+--[-*-*-*B*-]
+--[*-*B*-*-*]
+--[**B*B*B**]	
 
-moveUpRight board loc1 loc2 player = 	replace board 
-											(clearSpace 
-												(getRow
-													(replace board 
-														(replaceListElem (getRow board ((snd loc1) - 1)) ((fst loc1) + 1) player)
-													((snd loc1) - 1) 0)
-												(snd loc1))	
-											(fst loc1)) 
-										(snd loc1) 0
 
---FLIP IS NOT IN USE, CHANGED IDEA FOR NOW
+--------------------------FLIP IS NOT IN USE, CHANGED IDEA FOR NOW--------------------------------------------
 --reverse the board, and change loc1 and loc2's Y values, change player or move "up"
 --then flips the board so that we know we're on the other players turn
 --play who is playing will be on top when visualizing, but will flip back over once done, so when added to state it
@@ -191,6 +243,7 @@ moveUpRight board loc1 loc2 player = 	replace board
 --flipBoard_helper board loc1 loc2 player acc
 --	| null board = makeMove acc (fst loc1):((length board) - (snd loc1)) (fst loc2):((length board) - (snd loc2)) player
 --	| otherwise = flipBoard_helper (tail board) loc1 loc2 player((head board):acc)
+----------------------------FLIP IS NOT USED-------------------------------------------------
 
 --replace piece that moved with a -
 clearSpace str1 index = replaceListElem str1 index '-'
